@@ -1,18 +1,21 @@
 package com.example.storerest.config;
 
-import com.example.storerest.service.CustomUserDetailsService;
+import com.example.storerest.filters.CustomAuthenticationFilter;
+import com.example.storerest.filters.CustomAuthorizationFilter;
+import com.example.storerest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.Collection;
-import java.util.List;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
@@ -21,11 +24,18 @@ public class SecConfig extends WebSecurityConfigurerAdapter {
     protected PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
     @Autowired
     PasswordEncoder passwordEncoder;
 
     @Autowired
-    CustomUserDetailsService customUserDetailsService;
+    UserService customUserDetailsService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -33,10 +43,16 @@ public class SecConfig extends WebSecurityConfigurerAdapter {
                 .userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder);
     }
 
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests().anyRequest().permitAll().and().csrf().disable()
-                .formLogin().and().httpBasic();
+        CustomAuthenticationFilter authenticationFilter = new CustomAuthenticationFilter(authenticationManager());
+        authenticationFilter.setFilterProcessesUrl("/login");
+        http.csrf().disable();
+        http.sessionManagement().sessionCreationPolicy(STATELESS);
+        http.authorizeRequests().antMatchers("/login/**", "/signup/**", "/refreshToken/**").permitAll();
+        http.authorizeRequests().anyRequest().hasAuthority("USER");
+        http.addFilter(authenticationFilter);
+        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }

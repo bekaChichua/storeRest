@@ -12,7 +12,7 @@ public class Authorities implements GrantedAuthority {
 
     @Id
     private long id;
-    private String Authority;
+    private String Authority = "USER";
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_authority")

@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,14 +19,14 @@ public class User implements UserDetails {
     private String username;
     private String password;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
-    private Collection<Authorities> authorities;
+    private List<Authorities> authorities = Arrays.asList(new Authorities[]{});
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
     private List<Content> content;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
     private List<Comment> comment;
 
     public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
-        this.authorities = (Collection<Authorities>)authorities;
+        this.authorities = (List<Authorities>)authorities;
     }
 
     @Override
