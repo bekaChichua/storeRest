@@ -36,7 +36,6 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
-@CrossOrigin(origins = "http://localhost:3000/")
 public class UserController {
     @Autowired
     UserService userService;
@@ -50,6 +49,7 @@ public class UserController {
     public ResponseEntity insertUser(@RequestBody User user){
 //        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/user").toUriString());
 //        return ResponseEntity.created(uri).body(userService.insertUser(user));
+        log.info("Sign up user: {}", user);
         userService.insertUser(user);
         return new ResponseEntity(HttpStatus.CREATED);
     }

@@ -5,11 +5,12 @@ import com.example.storerest.service.ContentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:3000/")
 public class ContentController {
 
     @Autowired
@@ -18,5 +19,10 @@ public class ContentController {
     @GetMapping("/post")
     public List<Content> getUserContent(){
         return contentService.getContents();
+    }
+
+    @PostMapping("/post")
+    public void insertContent(HttpServletRequest request, HttpServletResponse response, @RequestBody Content content){
+        contentService.insertContent(request, response, content);
     }
 }

@@ -14,6 +14,7 @@ import java.util.List;
 @Data
 public class Content {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private Date date = new Date();
     private String body;
